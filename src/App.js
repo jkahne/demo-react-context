@@ -3,12 +3,14 @@ import './App.css';
 
 class Todo extends React.Component{
   render(){
-    const todo = this.props.todo;
+    const {section, todo} = this.props;
     return(
       <div>
         <input
           type="checkbox"
           id={`todo_${todo.id}`}
+          checked={todo.checked}
+          onChange={e => this.props.save(todo, section)}
         />
         <label>{todo.description}</label>
       </div>
@@ -26,6 +28,8 @@ class Section extends React.Component{
             <Todo
               key={todo.id}
               todo={todo}
+              section={this.props.section}
+              save={this.props.save}
             />
           ))}
         </div>
@@ -38,15 +42,24 @@ class App extends React.Component {
   state = {
     sections: [
       {id: 1, name: 'groceries', todos: [
-        {id: 1, description: 'milk'},
-        {id: 2, description: 'bread'}
+        {id: 1, description: 'milk', checked: false},
+        {id: 2, description: 'bread', checked: false}
       ]},
       {id: 2, name: 'home', todos: [
-        {id: 3, description: 'cut grass'},
-        {id: 4, description: 'dishes'},
-        {id: 5, description: 'nap'}
+        {id: 3, description: 'cut grass', checked: false},
+        {id: 4, description: 'dishes', checked: false},
+        {id: 5, description: 'nap', checked: false}
       ]},
     ],
+  }
+
+  save=(todo, section)=>{
+    const sections = this.state.sections
+    const sectionIndex = sections.findIndex(scanningSection => scanningSection.name === section.name)
+    const todoIndex = sections[sectionIndex].todos.findIndex(scanningTodo => scanningTodo.id === todo.id )
+    sections[sectionIndex].todos[todoIndex].checked = !sections[sectionIndex].todos[todoIndex].checked
+
+    this.setState({sections: sections })
   }
 
   render() {
@@ -56,6 +69,7 @@ class App extends React.Component {
           <Section
             key={section.id}
             section={section}
+            save={this.save}
           />
         ))}
       </div>
