@@ -3,16 +3,16 @@ import './App.css';
 
 class Todo extends React.Component{
   render(){
-    const {section, todo} = this.props;
+    const {section, todo, activeTodo} = this.props;
     return(
-      <div>
+      <div className={ activeTodo && activeTodo.id === todo.id ? 'active' : '' }>
         <input
           type="checkbox"
           id={`todo_${todo.id}`}
           checked={todo.checked}
           onChange={e => this.props.save(todo, section)}
         />
-        <label>{todo.description}</label>
+        <label onClick={e => this.props.selectActiveTodo(todo)}>{todo.description}</label>
       </div>
     )
   }
@@ -30,6 +30,8 @@ class Section extends React.Component{
               todo={todo}
               section={this.props.section}
               save={this.props.save}
+              activeTodo={this.props.activeTodo}
+              selectActiveTodo={this.props.selectActiveTodo}
             />
           ))}
         </div>
@@ -40,6 +42,7 @@ class Section extends React.Component{
 
 class App extends React.Component {
   state = {
+    activeTodo: null,
     sections: [
       {id: 1, name: 'groceries', todos: [
         {id: 1, description: 'milk', checked: false},
@@ -62,6 +65,10 @@ class App extends React.Component {
     this.setState({sections: sections })
   }
 
+  selectActiveTodo=(todo)=>{
+    this.setState({activeTodo: todo})
+  }
+
   render() {
     return (
       <div className="App">
@@ -70,6 +77,8 @@ class App extends React.Component {
             key={section.id}
             section={section}
             save={this.save}
+            activeTodo={this.state.activeTodo}
+            selectActiveTodo={this.selectActiveTodo}
           />
         ))}
       </div>
