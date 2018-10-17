@@ -4,9 +4,41 @@ import './App.css';
 export const MyContext = React.createContext()
 
 export class MyProvider extends React.Component{
+  state = {
+    activeTodo: null,
+    sections: [
+      {id: 1, name: 'groceries', todos: [
+        {id: 1, description: 'milk', checked: false},
+        {id: 2, description: 'bread', checked: false}
+      ]},
+      {id: 2, name: 'home', todos: [
+        {id: 3, description: 'cut grass', checked: false},
+        {id: 4, description: 'dishes', checked: false},
+        {id: 5, description: 'nap', checked: false}
+      ]},
+    ],
+  }
+
+  save=(todo, section)=>{
+    const sections = this.state.sections
+    const sectionIndex = sections.findIndex(scanningSection => scanningSection.name === section.name)
+    const todoIndex = sections[sectionIndex].todos.findIndex(scanningTodo => scanningTodo.id === todo.id )
+    sections[sectionIndex].todos[todoIndex].checked = !sections[sectionIndex].todos[todoIndex].checked
+
+    this.setState({sections: sections })
+  }
+
+  selectActiveTodo=(todo)=>{
+    this.setState({activeTodo: todo})
+  }
+
   render(){
     return(
-      <MyContext.Provider value={"hello from the context"} >
+      <MyContext.Provider value={{
+        state: this.state,
+        save: this.save,
+        selectActiveTodo: this.selectActiveTodo
+      }} >
        {this.props.children}
      </MyContext.Provider>
     )
@@ -53,49 +85,18 @@ class Section extends React.Component{
 }
 
 class App extends React.Component {
-  state = {
-    activeTodo: null,
-    sections: [
-      {id: 1, name: 'groceries', todos: [
-        {id: 1, description: 'milk', checked: false},
-        {id: 2, description: 'bread', checked: false}
-      ]},
-      {id: 2, name: 'home', todos: [
-        {id: 3, description: 'cut grass', checked: false},
-        {id: 4, description: 'dishes', checked: false},
-        {id: 5, description: 'nap', checked: false}
-      ]},
-    ],
-  }
-
-  save=(todo, section)=>{
-    const sections = this.state.sections
-    const sectionIndex = sections.findIndex(scanningSection => scanningSection.name === section.name)
-    const todoIndex = sections[sectionIndex].todos.findIndex(scanningTodo => scanningTodo.id === todo.id )
-    sections[sectionIndex].todos[todoIndex].checked = !sections[sectionIndex].todos[todoIndex].checked
-
-    this.setState({sections: sections })
-  }
-
-  selectActiveTodo=(todo)=>{
-    this.setState({activeTodo: todo})
-  }
-
   render() {
     return (
       <MyContext.Consumer>
         {(context) => (
           <div className="App">
-
-            <div>{context}</div>
-
-            {this.state.sections.map(section => (
+            {context.state.sections.map(section => (
               <Section
                 key={section.id}
                 section={section}
-                save={this.save}
-                activeTodo={this.state.activeTodo}
-                selectActiveTodo={this.selectActiveTodo}
+                save={context.save}
+                activeTodo={context.state.activeTodo}
+                selectActiveTodo={context.selectActiveTodo}
               />
             ))}
           </div>
