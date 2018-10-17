@@ -1,6 +1,18 @@
 import React from 'react';
 import './App.css';
 
+export const MyContext = React.createContext()
+
+export class MyProvider extends React.Component{
+  render(){
+    return(
+      <MyContext.Provider value={"hello from the context"} >
+       {this.props.children}
+     </MyContext.Provider>
+    )
+  }
+}
+
 class Todo extends React.Component{
   render(){
     const {section, todo, activeTodo} = this.props;
@@ -71,17 +83,25 @@ class App extends React.Component {
 
   render() {
     return (
-      <div className="App">
-        {this.state.sections.map(section => (
-          <Section
-            key={section.id}
-            section={section}
-            save={this.save}
-            activeTodo={this.state.activeTodo}
-            selectActiveTodo={this.selectActiveTodo}
-          />
-        ))}
-      </div>
+      <MyContext.Consumer>
+        {(context) => (
+          <div className="App">
+
+            <div>{context}</div>
+
+            {this.state.sections.map(section => (
+              <Section
+                key={section.id}
+                section={section}
+                save={this.save}
+                activeTodo={this.state.activeTodo}
+                selectActiveTodo={this.selectActiveTodo}
+              />
+            ))}
+          </div>
+        )}
+      </MyContext.Consumer>
+
     );
   }
 }
