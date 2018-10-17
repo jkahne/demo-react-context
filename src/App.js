@@ -47,17 +47,21 @@ export class MyProvider extends React.Component{
 
 class Todo extends React.Component{
   render(){
-    const {section, todo, activeTodo} = this.props;
+    const {section, todo} = this.props;
     return(
-      <div className={ activeTodo && activeTodo.id === todo.id ? 'active' : '' }>
-        <input
-          type="checkbox"
-          id={`todo_${todo.id}`}
-          checked={todo.checked}
-          onChange={e => this.props.save(todo, section)}
-        />
-        <label onClick={e => this.props.selectActiveTodo(todo)}>{todo.description}</label>
-      </div>
+      <MyContext.Consumer>
+        {(context) => (
+          <div className={ context.state.activeTodo && context.state.activeTodo.id === todo.id ? 'active' : '' }>
+            <input
+              type="checkbox"
+              id={`todo_${todo.id}`}
+              checked={todo.checked}
+              onChange={e => context.save(todo, section)}
+            />
+            <label onClick={e => context.selectActiveTodo(todo)}>{todo.description}</label>
+          </div>
+        )}
+      </MyContext.Consumer>
     )
   }
 }
@@ -73,9 +77,6 @@ class Section extends React.Component{
               key={todo.id}
               todo={todo}
               section={this.props.section}
-              save={this.props.save}
-              activeTodo={this.props.activeTodo}
-              selectActiveTodo={this.props.selectActiveTodo}
             />
           ))}
         </div>
@@ -94,9 +95,6 @@ class App extends React.Component {
               <Section
                 key={section.id}
                 section={section}
-                save={context.save}
-                activeTodo={context.state.activeTodo}
-                selectActiveTodo={context.selectActiveTodo}
               />
             ))}
           </div>
